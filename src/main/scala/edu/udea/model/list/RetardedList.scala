@@ -7,6 +7,6 @@ import scala.scalajs.js.annotation._
   */
 class RetardedList[T] {
 
-
+  
 
 }
