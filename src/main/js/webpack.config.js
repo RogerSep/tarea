@@ -48,6 +48,17 @@ module.exports = {
           } )
         },
         {
+          test: /\.css$/,
+          use: ExtractTextPlugin.extract( {
+            fallback: [
+              { loader: "style-loader" }
+            ],
+            use: [
+              { loader: "css-loader", options: { sourceMap: true, modules: false } }
+            ]
+          } )
+        },
+        {
           test: /\.md$/,
           use: [
             { loader: "html-loader" },

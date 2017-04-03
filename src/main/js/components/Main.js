@@ -1,6 +1,7 @@
 import React from "react"
 import styles from "./Main.scss"
 import Rx from "rx"
+import { XYPlot, XAxis, YAxis, HorizontalGridLines, LineSeries } from 'react-vis';
 
 const parse = window.exports.parse
 
@@ -123,6 +124,39 @@ export default class Main extends React.Component {
               <span>) = { this.state.resultado }</span>
               <div>
                 { this.state.resultado === 0 && `( x - ( ${this.state.x} ) ) es factor del polinomio` }
+              </div>
+              <div>
+                <XYPlot
+                  width={ 300 }
+                  height={ 300 }>
+                  <HorizontalGridLines />
+                  <LineSeries
+                    data={[
+                      {x: -10},
+                      {x: -9},
+                      {x: -8},
+                      {x: -7},
+                      {x: -6},
+                      {x: -5},
+                      {x: -4},
+                      {x: -3},
+                      {x: -2},
+                      {x: -1},
+                      {x: 0},
+                      {x: 1},
+                      {x: 2},
+                      {x: 3},
+                      {x: 4},
+                      {x: 5},
+                      {x: 6},
+                      {x: 7},
+                      {x: 8},
+                      {x: 9},
+                      {x: 10},
+                    ].map( i => ( { ...i, y: this.polinomio.eval( i.x ) } ) ) }/>
+                  <XAxis />
+                  <YAxis />
+                </XYPlot>
               </div>
             </div>
           </div>
