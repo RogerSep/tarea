@@ -1,11 +1,14 @@
 package edu.udea.model.polinomio
 
+import scala.scalajs.js.annotation.JSExportAll
+
 /**
   * Created by roger on 29/03/17.
   */
-case class Monomio( coeficiente: BigDecimal, exponente: BigDecimal ) {
+@JSExportAll
+case class Monomio( coeficiente: Double, exponente: Double ) {
 
-  def eval( x: BigDecimal ): BigDecimal = coeficiente *
+  def eval( x: Double ): Double = coeficiente *
     scala.math.pow( x.doubleValue(), exponente.doubleValue() )
 
   def derivada( n: Int ): Monomio = {

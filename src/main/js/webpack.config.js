@@ -1,6 +1,5 @@
 const path = require( "path" )
 const ExtractTextPlugin = require( "extract-text-webpack-plugin" )
-const HtmlWebpackPlugin = require( "html-webpack-plugin" )
 
 module.exports = {
     entry: path.resolve( __dirname, "index.js" ),
@@ -18,6 +17,13 @@ module.exports = {
 
     module: {
       rules: [
+        {
+          test: /\.js$/,
+          exclude: /node_modules/,
+          use: [
+            { loader: "babel-loader" }
+          ]
+        },
         {
           test: /\.css$/,
           use: ExtractTextPlugin.extract( {
@@ -52,13 +58,14 @@ module.exports = {
     },
 
     resolve: {
-      extensions: [ ".webpack.js", ".web.js", ".ts", ".tsx", ".js" ],
-      alias: {
-        "tarea$": path.resolve( __dirname, "../../../target/scala-2.12/tarea-fastopt.js" )
-      }
+      extensions: [ ".webpack.js", ".web.js", ".ts", ".tsx", ".js" ]
+    },
+
+    externals: {
+      tarea: "tarea"
     },
 
     plugins: [
-      new HtmlWebpackPlugin()
+      new ExtractTextPlugin("styles.css")
     ]
 };

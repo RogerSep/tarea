@@ -1,31 +1,49 @@
 package edu.udea.model.polinomio
 
+import scala.scalajs.js
+import scala.scalajs.js.Array
+import scala.scalajs.js.annotation.JSExportAll
+
 /**
   * Created by roger on 29/03/17.
   */
 object Polinomio {
 
-  def apply( monomios: List[ Monomio ] ) = new Polinomio(
-    monomios
-      .groupBy( _.exponente )
-      .foldLeft( List[ Monomio ]() )( ( acc, m ) => {
-        val coeficiente = m._2.foldLeft( BigDecimal( 0 ) )( _ + _.coeficiente )
+  val cero: Array[ Monomio ] = js.Array[ Monomio ]()
+  cero.push( Monomio( 0, 0 ) )
 
-        Monomio( coeficiente, m._1 ) :: acc
+  def apply( monomios: js.Array[ Monomio ] ) = {
+    val m = monomios
+      .groupBy( _.exponente )
+      .foldLeft( js.Array[ Monomio ]() )( ( acc, m ) => {
+        val coeficiente = m._2.foldLeft( 0.0 )( _ + _.coeficiente )
+
+        acc.push( Monomio( coeficiente, m._1 ) )
+        acc
       } )
       .filter( _.coeficiente != 0 )
       .sortBy( _.exponente )
-  )
+
+    new Polinomio(
+      m.length match {
+        case 0 => cero
+        case _ => m
+      }
+    )
+  }
+
+
 
 }
 
-class Polinomio( val monomios: List[ Monomio ] ) {
+@JSExportAll
+class Polinomio( val monomios: js.Array[ Monomio ] ) {
 
-  def eval( x: BigDecimal ): BigDecimal = monomios
-    .foldLeft( BigDecimal( 0 ) )( ( acc, m ) => acc + m.eval( x ) )
+  def eval( x: Double ): Double = monomios
+    .foldLeft( 0.0 )( ( acc, m ) => acc + m.eval( x ) )
 
   def sumar( p: Polinomio ): Polinomio = Polinomio(
-    monomios ::: p.monomios
+    monomios.concat( p.monomios )
   )
 
   def multiplicar( p: Polinomio ): Polinomio = {

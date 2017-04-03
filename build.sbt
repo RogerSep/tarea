@@ -1,3 +1,5 @@
+import org.scalajs.core.tools.linker.backend.ModuleKind.{CommonJSModule}
+
 name := "tarea"
 
 version := "1.0"
@@ -14,4 +16,4 @@ enablePlugins( ScalaJSPlugin )
 
 artifactPath in fastOptJS := file("./dist")
 
-scalaJSModuleKind := ModuleKind.CommonJSModule
+scalaJSModuleKind := CommonJSModule
