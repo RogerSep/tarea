@@ -25,14 +25,21 @@ class Polinomio( val monomios: List[ Monomio ] ) {
     .foldLeft( BigDecimal( 0 ) )( ( acc, m ) => acc + m.eval( x ) )
 
   def sumar( p: Polinomio ): Polinomio = Polinomio(
-    monomios.zipAll( p.monomios, Monomio( 0, 1 ), Monomio( 0, 1) )
-      .foldLeft( List[ Monomio ]() )( ( acc, m ) => {
-        if ( m._1.exponente == m._2.exponente )
-          Monomio( m._1.coeficiente + m._2.coeficiente, m._1.exponente ) :: acc
-        else
-          List( m._1, m._2 ) ::: acc
-      } )
+    monomios ::: p.monomios
   )
+
+  def multiplicar( p: Polinomio ): Polinomio = {
+    Polinomio(
+      monomios
+        .flatMap( m => p.monomios.map( pm => m.multiplicar( pm ) ) )
+    )
+  }
+
+  def derivada( n: Int ): Polinomio =
+    Polinomio( monomios.map( _.derivada( n ) ) )
+
+  def integral(): Polinomio =
+    Polinomio( monomios.map( _.integral() ) )
 
   override def equals( o: scala.Any ): Boolean = o match {
     case p: Polinomio => p.monomios.equals( this.monomios )
