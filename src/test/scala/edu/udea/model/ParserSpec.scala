@@ -1,7 +1,7 @@
 package edu.udea.model
 
 import edu.udea.model.polinomio.{Monomio, Polinomio}
-import fastparse.core.Parsed.{Failure, Success}
+import fastparse.core.Parsed.Success
 import org.scalatest.{FunSuite, Matchers}
 
 /**
@@ -9,7 +9,6 @@ import org.scalatest.{FunSuite, Matchers}
   */
 class ParserSpec extends FunSuite with Matchers {
 
-  import fastparse._
   import PolinomioParser._
 
   test( "parseando los strings de la aplicación" ) {

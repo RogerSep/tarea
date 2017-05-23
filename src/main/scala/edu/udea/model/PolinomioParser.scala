@@ -3,9 +3,6 @@ package edu.udea.model
 import edu.udea.model.polinomio.{Monomio, Polinomio}
 import fastparse.utils.Utils
 
-import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExportTopLevel}
-
 /**
   * Created by roger on 4/2/17.
   */
@@ -34,15 +31,12 @@ object PolinomioParser {
   }
 
   val poliVacio: Parser[ Polinomio ] = P( Start ~ End ).map { _ =>
-    Polinomio( js.Array(  ) )
+    Polinomio( Nil )
   }
 
   val poli: Parser[ Polinomio ] = P( monomio.rep( 1 ) ).map { x =>
-      // val ( m, ms ) = x
-
-    val m = x.foldLeft( js.Array[ Monomio ]() )( ( acc, m ) => {
-      acc.push( m )
-      acc
+    val m = x.foldLeft( List[ Monomio ]() )( ( acc, m ) => {
+      m :: acc
     } )
     Polinomio( m )
   }
@@ -61,7 +55,7 @@ object PolinomioParser {
         case Some( ( linf, lsup ) ) => {
           val integral = pol.integral()
 
-          Polinomio( js.Array( Monomio( integral.eval( lsup ) - integral.eval( linf ), 0 ) ) )
+          Polinomio( List( Monomio( integral.eval( lsup ) - integral.eval( linf ), 0 ) ) )
         }
       }
     }
@@ -79,7 +73,6 @@ object PolinomioParser {
 
   val expresion = P( ( poliVacio | integral | derivada | poli | sumaomult | parentesis ) ~/ End )
 
-  @JSExportTopLevel( "parse" )
   def parse( expr: String ) = {
     val x = expr
       .replaceAll( "\\s", "" )
