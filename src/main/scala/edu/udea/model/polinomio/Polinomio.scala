@@ -55,6 +55,9 @@ class Polinomio( val monomios: List[ Monomio ] ) {
     case _ => super.equals(o)
   }
 
-  override def toString() = monomios.mkString(" ")
+  override def toString() = monomios
+    .sortBy(_.exponente)(Ordering.BigDecimal.reverse)
+    .mkString(" +")
+    .replaceAll("\\+-", "-")
 
 }

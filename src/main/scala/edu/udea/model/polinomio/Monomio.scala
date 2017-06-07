@@ -15,4 +15,6 @@ case class Monomio( coeficiente: BigDecimal, exponente: BigDecimal ) {
 
   def integral(): Monomio = Monomio( coeficiente / ( exponente + 1 ), exponente + 1 )
 
+  override def toString: String = s"${coeficiente.toString()}x${exponente.toString}"
+
 }

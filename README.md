@@ -59,3 +59,6 @@ donde se ve la definición del álgebra.
 
 En cuanto a la interfaz gráfica, la aplicación inicia en `src/main/js/index.js`, se utilizó la librería 
 React.js para definir los componentes gráficos.
+
+
+http://cjtcs.cs.uchicago.edu/articles/CATS2009/3/cats9-3.pdf
