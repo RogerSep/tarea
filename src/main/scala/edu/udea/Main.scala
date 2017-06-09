@@ -40,7 +40,7 @@ object Main {
       GrafoReader.leerArchivo(f) match {
         case Success(grafo) => {
           val start = System.currentTimeMillis()
-          val polinomio = grafo.polinomio()
+          val polinomio = grafo.polinomioVorder()
           val took = System.currentTimeMillis() - start
 
           Files.write(
@@ -48,9 +48,8 @@ object Main {
               .fold{
                 Paths.get(f.getParent, f.getName.replace(".col", ".res"))
               }
-              (f => f.toPath),
-            s"""
-              |T:
+              (outDir => Paths.get(outDir.getAbsolutePath, f.getName.replace(".col", ".res"))),
+            s"""T:
               |${took}
               |P(G,x):
               |${polinomio.toString()}
