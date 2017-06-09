@@ -50,6 +50,10 @@ class Polinomio( val monomios: List[ Monomio ] ) {
   def integral(): Polinomio =
     Polinomio( monomios.map( _.integral() ) )
 
+  def map(f: Monomio => Monomio): Polinomio = {
+    Polinomio(monomios.map(f))
+  }
+
   override def equals( o: scala.Any ): Boolean = o match {
     case p: Polinomio => p.monomios.equals( this.monomios )
     case _ => super.equals(o)

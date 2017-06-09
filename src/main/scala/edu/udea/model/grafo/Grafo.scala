@@ -2,7 +2,17 @@ package edu.udea.model.grafo
 
 import edu.udea.model.polinomio.{Monomio, Polinomio}
 
-case class Grafo(aristas: List[(Int, List[Int])]) {
+object Grafo {
+
+  def nuevo(aristas: List[(Int, Set[Int])]): Grafo = {
+    new Grafo(
+      aristas.sortBy(x => (x._2.size, x._1))(Ordering.Tuple2(Ordering.Int.reverse, Ordering.Int))
+    )
+  }
+
+}
+
+case class Grafo(aristas: List[(Int, Set[Int])]) {
 
   def esCompleto(): Boolean = {
     aristas.forall { a =>
@@ -15,10 +25,32 @@ case class Grafo(aristas: List[(Int, List[Int])]) {
   }
 
   def agregarArista(a: Int, b: Int): Grafo = {
-    val na = (a, aristas.find(_._1 == a).map(x => (b :: x._2).distinct).getOrElse(List(b)))
-    val nb = (b, aristas.find(_._1 == b).map(x => (a :: x._2).distinct).getOrElse(List(a)))
+    val la = aristas.collectFirst {
+      case (x, l) if (x == a) => l + b
+    } getOrElse(Set(b))
 
-    Grafo(List(na, nb) ++ aristas.filter(x => x._1 != a && x._1 != b))
+    val lb = aristas.collectFirst {
+      case (x, l) if (x == b) => l + a
+    } getOrElse(Set(a))
+
+    Grafo.nuevo(
+      List((a, la)).filter(_ => !aristas.exists(_._1 == a)) ++
+      List((b, lb)).filter(_ => !aristas.exists(_._1 == b)) ++
+      aristas.collect {
+        case (i, l) if (i == a) => (i, la)
+        case (i, l) if (i == b) => (i, lb)
+        case (i, l) => (i, l)
+      }
+    )
+  }
+
+  def eliminarArista(a: Int, b: Int): Grafo = {
+    Grafo.nuevo(
+      aristas.collect {
+        case (i, l) if (i == a || i == b) => (i, l.filter(x => x != a && x != b))
+        case (i, l) => (i, l)
+      }
+    )
   }
 
   def polinomio(): Polinomio = {
@@ -39,20 +71,46 @@ case class Grafo(aristas: List[(Int, List[Int])]) {
     }
   }
 
-  def combinarVertices(a: Int, b: Int): Grafo = {
-    val nuevasAristas = aristas.foldLeft(List.empty[(Int, List[Int])]) { (acc, arista) =>
-      if (arista._1 == a) {
-        val conexionesB = aristas.find(_._1 == b).map(_._2).getOrElse(Nil)
+  def polinomioVorder(): Polinomio = {
+    if (esCompleto()) {
+      (1 until aristas.size).foldLeft(Polinomio(List(Monomio(1, 1)))) { (p, i) =>
+        p.multiplicar(Polinomio(List(Monomio(1, 1), Monomio(-i, 0))))
+      }
+    } else if (esDesconexo()) {
+      Polinomio(List(Monomio(1, aristas.size)))
+    } else {
+      aristaAReducir()
+        .fold[Polinomio]({
+          println("Falla para")
+          println(aristas)
+          Polinomio(List())
+        }) { x =>
+          eliminarArista(x._1, x._2).polinomioVorder().sumar(
+            combinarVertices(x._1, x._2).polinomioVorder()
+              .map(m => m.copy(coeficiente = -1 * m.coeficiente))
+          )
+        }
+    }
+  }
 
-        (b, (arista._2 ++ conexionesB).distinct.filter(x => x != a && x != b )) :: acc
-      } else if (arista._1 == b) {
-        acc
-      } else {
-        (arista._1, arista._2.map(x => if (x == a) b else x).distinct) :: acc
+  def combinarVertices(a: Int, b: Int): Grafo = {
+    val nuevasAristas =
+      aristas.collect {
+        case (i, l) if (i != a && i != b) => (i, l.map(x => if (x == b) a else x))
+        case (i, l) if (i == a) => (i, aristas.collectFirst{
+          case (x, ll) if (x == b) => l.union(ll).diff(Set(a, b))
+        }.getOrElse(l))
+      }
+
+    Grafo.nuevo(nuevasAristas)
+  }
+
+  def aristaAReducir(): Option[(Int, Int)] = {
+    aristas.headOption.flatMap { h =>
+      h._2.collectFirst {
+        case i if (aristas.exists(x => x._1 == i && !x._2.isEmpty)) => (h._1, i)
       }
     }
-
-    Grafo(nuevasAristas)
   }
 
   def aristaFaltante(): Option[(Int, Int)] = {

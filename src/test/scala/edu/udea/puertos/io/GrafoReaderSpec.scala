@@ -13,12 +13,12 @@ class GrafoReaderSpec extends WordSpec with Matchers {
     GrafoReader.crearGrafo(5, List(
       (1, 2)
     )) should equal (
-      Grafo(List(
-        (1, List(2)),
-        (2, List(1)),
-        (3, Nil),
-        (4, Nil),
-        (5, Nil)
+      Grafo.nuevo(List(
+        (1, Set(2)),
+        (2, Set(1)),
+        (3, Set.empty),
+        (4, Set.empty),
+        (5, Set.empty)
       ))
     )
   }
@@ -30,20 +30,36 @@ class GrafoReaderSpec extends WordSpec with Matchers {
 
     GrafoReader.leerArchivo(testFile) should equal (
       Success(
-        Grafo(List(
-          (1, List(5)),
-          (5, List(1)),
-          (2, Nil),
-          (3, Nil),
-          (4, Nil),
-          (6, Nil),
-          (7, Nil),
-          (8, Nil),
-          (9, Nil),
-          (10, Nil)
+        Grafo.nuevo(List(
+          (1, Set(5)),
+          (5, Set(1)),
+          (2, Set.empty),
+          (3, Set.empty),
+          (4, Set.empty),
+          (6, Set.empty),
+          (7, Set.empty),
+          (8, Set.empty),
+          (9, Set.empty),
+          (10, Set.empty)
         ))
       )
     )
+
+    println(GrafoReader.leerArchivo(new File("/Users/roger/Downloads/chromaticPolynomial_instances 2/graph0008_n0010_m00004_f4.col")))
+
+  }
+
+  "blah" in {
+
+    val g = GrafoReader
+      .leerArchivo(new File("/Users/roger/Downloads/chromaticPolynomial_instances 2/graph0020_n0010_m00022_f4.col"))
+      .get
+
+    val start = System.currentTimeMillis()
+    val poly = g.polinomioVorder()
+    val took = System.currentTimeMillis() - start
+    println(took)
+    println(poly)
 
   }
 

@@ -33,7 +33,7 @@ object GrafoReader {
 
   def crearGrafo(nodos: Int, vertices: List[(Int, Int)]): Grafo = {
     vertices
-      .foldLeft(Grafo((1 to nodos).map(x => (x, List.empty[Int])).toList)) { (g, a) =>
+      .foldLeft(Grafo.nuevo((1 to nodos).map(x => (x, Set.empty[Int])).toList)) { (g, a) =>
         g.agregarArista(a._1, a._2)
       }
   }

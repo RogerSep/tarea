@@ -10,20 +10,20 @@ class GrafoSpec extends FunSpec with Matchers {
 
   describe("Grafos") {
     it("es completo cuando todos sus vértices están conectados") {
-      Grafo(List(
-        (1, List(2, 3, 4)),
-        (2, List(1, 3, 4)),
-        (3, List(1, 2, 4)),
-        (4, List(1, 2, 3))
+      Grafo.nuevo(List(
+        (1, Set(2, 3, 4)),
+        (2, Set(1, 3, 4)),
+        (3, Set(1, 2, 4)),
+        (4, Set(1, 2, 3))
       ))
     }
 
     it("el polinomio de un grafo completo es x(x − 1)(x − 2)...(x − (n − 1))") {
-      Grafo(List(
-        (1, List(2, 3, 4)),
-        (2, List(1, 3, 4)),
-        (3, List(1, 2, 4)),
-        (4, List(1, 2, 3))
+      Grafo.nuevo(List(
+        (1, Set(2, 3, 4)),
+        (2, Set(1, 3, 4)),
+        (3, Set(1, 2, 4)),
+        (4, Set(1, 2, 3))
       )) polinomio() should equal (Polinomio(List(
         Monomio(1, 4),
         Monomio(-6, 3),
@@ -31,12 +31,12 @@ class GrafoSpec extends FunSpec with Matchers {
         Monomio(-6, 1)
       )))
 
-      Grafo(List(
-        (1, List(2, 3, 4, 5)),
-        (2, List(1, 3, 4, 5)),
-        (3, List(1, 2, 4, 5)),
-        (4, List(1, 2, 3, 5)),
-        (5, List(1, 2, 3, 4))
+      Grafo.nuevo(List(
+        (1, Set(2, 3, 4, 5)),
+        (2, Set(1, 3, 4, 5)),
+        (3, Set(1, 2, 4, 5)),
+        (4, Set(1, 2, 3, 5)),
+        (5, Set(1, 2, 3, 4))
       )) polinomio() should equal (Polinomio(List(
         Monomio(1, 5),
         Monomio(-10, 4),
@@ -47,55 +47,83 @@ class GrafoSpec extends FunSpec with Matchers {
     }
 
     it("el polinomio del grafo desconexo es x^n") {
-      Grafo(List(
-        (1, Nil),
-        (2, Nil),
-        (3, Nil),
-        (4, Nil),
-        (5, Nil)
+      Grafo.nuevo(List(
+        (1, Set.empty),
+        (2, Set.empty),
+        (3, Set.empty),
+        (4, Set.empty),
+        (5, Set.empty)
       )) polinomio() should equal(Polinomio(List(
         Monomio(1, 5)
       )))
     }
 
     it("calcula una arista faltante") {
-      Grafo(List(
-        (1, List(2, 3, 4, 5)),
-        (2, List(1, 3, 4, 5)),
-        (3, List(1, 2, 4, 5)),
-        (4, List(1, 2, 3)),
-        (5, List(1, 2, 3))
+      Grafo.nuevo(List(
+        (1, Set(2, 3, 4, 5)),
+        (2, Set(1, 3, 4, 5)),
+        (3, Set(1, 2, 4, 5)),
+        (4, Set(1, 2, 3)),
+        (5, Set(1, 2, 3))
       )) aristaFaltante() should equal (Some((4, 5)))
     }
 
-    it("elimina una arista haciendo merge de las conexiones") {
-      val g = Grafo(List(
-        (1, List(2, 3, 4, 5)),
-        (2, List(1, 3, 4, 5)),
-        (3, List(1, 2, 4, 5)),
-        (4, List(1, 2, 3, 5)),
-        (5, List(1, 2, 3, 4))
+    it("calcula la arista a eliminar") {
+      Grafo.nuevo(List(
+        (0, Set.empty),
+        (1, Set.empty)
+      )) aristaAReducir() should equal (None)
+
+      Grafo.nuevo(List(
+        (0, Set(1)),
+        (1, Set(0))
+      )) aristaAReducir() should equal (Some(0, 1))
+
+      Grafo.nuevo(List(
+        (2, Set(1)),
+        (0, Set(1, 2, 3, 4)),
+        (3, Set(1)),
+        (1, Set(2, 3)),
+        (4, Set(1))
+      )) aristaAReducir() should equal (Some(0, 1))
+    }
+
+    it("combina una arista") {
+      val g = Grafo.nuevo(List(
+        (1, Set(2, 3, 4, 5)),
+        (2, Set(1, 3, 4, 5)),
+        (3, Set(1, 2, 4, 5)),
+        (4, Set(1, 2, 3, 5)),
+        (5, Set(1, 2, 3, 4))
       )) combinarVertices (1, 2)
 
-      println(g)
+      g should equal(Grafo.nuevo(List(
+        (1, Set(3, 4, 5)),
+        (3, Set(1, 4, 5)),
+        (4, Set(1, 3, 5)),
+        (5, Set(1, 3, 4))
+      )))
     }
 
     it("polinomio del grafo petersen") {
+
+      val petersen = Grafo.nuevo(List(
+        (1, Set(2, 5, 6)),
+        (2, Set(1, 3, 7)),
+        (3, Set(2, 4, 8)),
+        (4, Set(3, 5, 9)),
+        (5, Set(1, 4, 10)),
+        (6, Set(1, 8, 9)),
+        (7, Set(2, 9, 10)),
+        (8, Set(3, 6, 10)),
+        (9, Set(4, 6, 7)),
+        (10, Set(5, 7, 8))
+      ))
+
       val start = System.currentTimeMillis()
 
-      val p = Grafo(List(
-        (1, List(2, 5, 6)),
-        (2, List(1, 3, 7)),
-        (3, List(2, 4, 8)),
-        (4, List(3, 5, 9)),
-        (5, List(1, 4, 10)),
-        (6, List(1, 8, 9)),
-        (7, List(2, 9, 10)),
-        (8, List(3, 6, 10)),
-        (9, List(4, 6, 7)),
-        (10, List(5, 7, 8))
-      )).polinomio()
-
+      val p = petersen.polinomioVorder()
+      val pv = petersen.polinomio()
 
       p should equal(Polinomio(List(
         Monomio(1, 10),
@@ -109,6 +137,8 @@ class GrafoSpec extends FunSpec with Matchers {
         Monomio(2606, 2),
         Monomio(-704, 1)
       )))
+
+      pv should equal (p)
     }
 
   }
